@@ -10,10 +10,30 @@ namespace EM_Test.Controllers
     public class OrderController : Controller
     {
         private readonly IRepository<Order> _repository;
+        private readonly ISortable<Order> _sorter;
 
-        public OrderController(IRepository<Order> repository)
+        public OrderController(IRepository<Order> repository, ISortable<Order> sorter)
         {
             _repository = repository;
+            _sorter = sorter;
+        }
+
+        [HttpPut("sort")]
+        public async Task<ActionResult<IEnumerable<Order>>> Sort(Location location, DateTime date)
+        {
+            try
+            {
+                var orders = await _sorter.Sort(location, date);
+                if (orders == null)
+                {
+                    return NotFound();
+                }
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpGet]

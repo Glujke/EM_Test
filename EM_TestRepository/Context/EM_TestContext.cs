@@ -19,6 +19,10 @@ namespace EM_TestRepository.Context
                  .HasOne(p => p.Location)
                  .WithMany()
                  .HasForeignKey(p => p.LocationId);
+
+            modelBuilder.Entity<Location>()
+                 .HasIndex(l => l.Name)
+                 .IsUnique();
         }
     }
 }

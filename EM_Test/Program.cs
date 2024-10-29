@@ -18,7 +18,8 @@ builder.Services.AddDbContext<EM_TestContext>(options =>
 options.UseSqlite("Data Source=EM_Test.db"));
 
 builder.Services.AddScoped<IRepository<Location>, RepositoryBase<Location>>();
-builder.Services.AddScoped<IRepository<Order>, RepositoryBase<Order>>();
+builder.Services.AddScoped<IRepository<Order>, RepositoryOrder>();
+builder.Services.AddScoped<ISortable<Order>, RepositoryOrder>();
 
 var app = builder.Build();
 
