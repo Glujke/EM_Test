@@ -25,7 +25,7 @@ namespace EM_Test.Services
         public async Task Sort(RequestModel request)
         {
             var orders = await _sorter.Sort(request.LocationId, request.RequestTime);
-            if (orders == null)
+            if (orders == null || orders.Count() == 0)
             {
                 _logger.LogInformation($"Request {request.LocationId} from date {request.RequestTime}. Answer: Not found");
                 request.Answer = "Not found";
@@ -38,6 +38,7 @@ namespace EM_Test.Services
             request.Answer = JsonSerializer.Serialize(orders);
             await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
             request.IsSuccess = true;
+            return;
         }
     }
 }

@@ -3,10 +3,8 @@ using EM_TestRepository.Context;
 using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Numerics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,11 +40,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler("/error");
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
