@@ -11,11 +11,13 @@ namespace EM_Test.Controllers
     {
         private readonly IRepository<Order> _repository;
         private readonly ISortable<Order> _sorter;
+        private readonly ILogger<OrderController> _logger;
 
-        public OrderController(IRepository<Order> repository, ISortable<Order> sorter)
+        public OrderController(IRepository<Order> repository, ISortable<Order> sorter, ILogger<OrderController> logger)
         {
             _repository = repository;
             _sorter = sorter;
+            _logger = logger;
         }
 
         [HttpPut("sort")]
@@ -28,10 +30,12 @@ namespace EM_Test.Controllers
                 {
                     return NotFound();
                 }
+                _logger.LogInformation($"Request {idLocation} from date {date}");
                 return Ok(orders);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception");
                 return StatusCode(500);
             }
         }
