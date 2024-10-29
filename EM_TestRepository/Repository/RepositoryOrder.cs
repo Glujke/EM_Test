@@ -17,9 +17,13 @@ namespace EM_TestRepository.Repository
 
         public async Task<IEnumerable<Order>> Sort(int idLocation, DateTime date)
         {
+            var dateLast = date.AddMinutes(30);
             var location = await _context.Locations.SingleOrDefaultAsync(l => l.Id == idLocation);
             if (location == null) return null;
-            var result = await _context.Orders.Where(o => o.Date >= date).Where(o => o.LocationId == location.Id).Include(o => o.Location).ToListAsync();
+            var result = await _context.Orders.Where(o => o.Date >= date)
+                                         .Where(o => o.Date <= dateLast)
+                                         .Where(o => o.LocationId == location.Id)
+                                         .Include(o => o.Location).ToListAsync();
             return result;
         }
     }

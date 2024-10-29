@@ -1,7 +1,7 @@
 ﻿using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
+using System.Text.Json;
 
 namespace EM_Test.Controllers
 {
@@ -24,11 +24,12 @@ namespace EM_Test.Controllers
         public async Task<ActionResult<IEnumerable<Order>>> Sort(int idLocation, DateTime date)
         {
             var orders = await _sorter.Sort(idLocation, date);
-            if (orders == null)
+            if (orders == null || orders.Count() == 0)
             {
+                _logger.LogInformation($"Request {idLocation} from date {date}. Answer: Not found");
                 return NotFound();
             }
-            _logger.LogInformation($"Request {idLocation} from date {date}");
+            _logger.LogInformation($"Request {idLocation} from date {date}. Answer:{JsonSerializer.Serialize(orders)}");
             return Ok(orders);
         }
 
