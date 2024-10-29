@@ -6,7 +6,7 @@
         public int Number { get; set; }
         public float Weight { get; set; }
 
-        public Location Location{ get; set; }
+        public Location? Location{ get; set; }
         public int LocationId { get; set; }
         public DateTime Date { get; set; }
     }

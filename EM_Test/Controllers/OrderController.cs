@@ -4,7 +4,6 @@ using EM_Test.Services;
 using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace EM_Test.Controllers
 {
@@ -13,15 +12,17 @@ namespace EM_Test.Controllers
     public class OrderController : Controller
     {
         private readonly IRepository<Order> _orderRepository;
+        private readonly IRepository<Location> _locationRepository;
         private readonly SortedService _sortedService;
 
-        public OrderController(IRepository<Order> orderRepository, SortedService sortedService)
+        public OrderController(IRepository<Order> orderRepository, SortedService sortedService, IRepository<Location> locationRepository)
         {
             _orderRepository = orderRepository;
+            _locationRepository = locationRepository;
             _sortedService = sortedService;
         }
 
-        [HttpGet("sort")]
+        [HttpGet("Sort")]
         public async Task<ActionResult<IEnumerable<OrderModel>>> Sort(int idLocation, DateTime date)
         {
             var request = new RequestModel() { LocationId = idLocation, RequestTime = date };
@@ -30,6 +31,7 @@ namespace EM_Test.Controllers
             {
                 return NotFound();
             }
+
             return Ok(request.AnswerModel);
         }
 
@@ -41,6 +43,7 @@ namespace EM_Test.Controllers
             {
                 return NotFound();
             }
+
             return Ok(OrderMapper.ToApiModel(orders));
         }
 
@@ -52,6 +55,7 @@ namespace EM_Test.Controllers
             {
                 return NotFound();
             }
+
             return OrderMapper.ToApiModel(order);
         }
 
@@ -62,7 +66,18 @@ namespace EM_Test.Controllers
             {
                 return BadRequest(ModelState);
             }
-            await _orderRepository.CreateAsync(OrderMapper.FromApiModel(order));
+            var orderEntity = OrderMapper.FromApiModel(order);
+            var localLocation = await _locationRepository.GetByIdAsync(order.Location.Id);
+            if (localLocation != null)
+            {
+                orderEntity.Location = null;
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+            await _orderRepository.CreateAsync(orderEntity);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
@@ -77,7 +92,18 @@ namespace EM_Test.Controllers
             {
                 return BadRequest();
             }
-            await _orderRepository.UpdateAsync(OrderMapper.FromApiModel(order));
+            var orderEntity = OrderMapper.FromApiModel(order);
+            var localLocation = await _locationRepository.GetByIdAsync(order.Location.Id);
+            if (localLocation != null)
+            {
+                orderEntity.Location = null;
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+            await _orderRepository.UpdateAsync(orderEntity);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
@@ -89,6 +115,7 @@ namespace EM_Test.Controllers
             {
                 return NotFound();
             }
+
             await _orderRepository.DeleteAsync(order);
             return Ok();
         }
