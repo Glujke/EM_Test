@@ -10,12 +10,15 @@ namespace EM_Test.Controllers
     public class OrderController : Controller
     {
         private readonly IRepository<Order> _repository;
+        private readonly IRepository<Request> _repositoryReq;
         private readonly ISortable<Order> _sorter;
         private readonly ILogger<OrderController> _logger;
 
-        public OrderController(IRepository<Order> repository, ISortable<Order> sorter, ILogger<OrderController> logger)
+        public OrderController(IRepository<Order> repository, IRepository<Request> repositoryReq,
+            ISortable<Order> sorter, ILogger<OrderController> logger)
         {
             _repository = repository;
+            _repositoryReq = repositoryReq;
             _sorter = sorter;
             _logger = logger;
         }
@@ -23,13 +26,18 @@ namespace EM_Test.Controllers
         [HttpGet("sort")]
         public async Task<ActionResult<IEnumerable<Order>>> Sort(int idLocation, DateTime date)
         {
+            var request = new Request() { LocationId = idLocation, RequestTime = date };
             var orders = await _sorter.Sort(idLocation, date);
             if (orders == null || orders.Count() == 0)
             {
                 _logger.LogInformation($"Request {idLocation} from date {date}. Answer: Not found");
+                request.Answer = "Not found";
+                await _repositoryReq.CreateAsync(request);
                 return NotFound();
             }
             _logger.LogInformation($"Request {idLocation} from date {date}. Answer:{JsonSerializer.Serialize(orders)}");
+            request.Answer = JsonSerializer.Serialize(orders);
+            await _repositoryReq.CreateAsync(request);
             return Ok(orders);
         }
 
