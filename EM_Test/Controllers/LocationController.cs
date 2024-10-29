@@ -18,96 +18,61 @@ namespace EM_Test.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Location>>> GetAll()
         {
-            try
+            var locations = await _repository.GetAllAsync();
+            if (locations == null)
             {
-                var locations = await _repository.GetAllAsync();
-                if (locations == null)
-                {
-                    return NotFound();
-                }
-                return Ok(locations);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            return Ok(locations);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Location>> GetById(int id)
         {
-            try
+            var location = await _repository.GetByIdAsync(id);
+            if (location == null)
             {
-                var location = await _repository.GetByIdAsync(id);
-                if (location == null)
-                {
-                    return NotFound();
-                }
-                return location;
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            return location;
         }
 
         [HttpPost]
         public async Task<ActionResult<Location>> Post([FromBody] Location location)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                await _repository.CreateAsync(location);
-                return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            await _repository.CreateAsync(location);
+            return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Location location)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                if (id != location.Id)
-                {
-                    return BadRequest();
-                }
-                await _repository.UpdateAsync(location);
-                return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+            if (id != location.Id)
             {
-                return StatusCode(500);
+                return BadRequest();
             }
+            await _repository.UpdateAsync(location);
+            return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
+            var location = await _repository.GetByIdAsync(id);
+            if (location == null)
             {
-                var location = await _repository.GetByIdAsync(id);
-                if (location == null)
-                {
-                    return NotFound();
-                }
-                await _repository.DeleteAsync(location);
-                return Ok();
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            await _repository.DeleteAsync(location);
+            return Ok();
         }
     }
 }

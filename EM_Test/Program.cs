@@ -22,9 +22,9 @@ options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
 Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .CreateLogger();
-
-
 builder.Host.UseSerilog();
+
+
 builder.Services.AddScoped<IRepository<Location>, RepositoryBase<Location>>();
 builder.Services.AddScoped<IRepository<Order>, RepositoryOrder>();
 builder.Services.AddScoped<ISortable<Order>, RepositoryOrder>();
@@ -36,6 +36,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EM Test API V1"));
 }
+
+app.UseExceptionHandler("/error");
 
 app.UseHttpsRedirection();
 

@@ -20,119 +20,76 @@ namespace EM_Test.Controllers
             _logger = logger;
         }
 
-        [HttpPut("sort")]
+        [HttpGet("sort")]
         public async Task<ActionResult<IEnumerable<Order>>> Sort(int idLocation, DateTime date)
         {
-            try
+            var orders = await _sorter.Sort(idLocation, date);
+            if (orders == null)
             {
-                var orders = await _sorter.Sort(idLocation, date);
-                if (orders == null)
-                {
-                    return NotFound();
-                }
-                _logger.LogInformation($"Request {idLocation} from date {date}");
-                return Ok(orders);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception");
-                return StatusCode(500);
-            }
+            _logger.LogInformation($"Request {idLocation} from date {date}");
+            return Ok(orders);
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetAll()
         {
-            try
+            var orders = await _repository.GetAllAsync();
+            if (orders == null)
             {
-                var orders = await _repository.GetAllAsync();
-                if (orders == null)
-                {
-                    return NotFound();
-                }
-                return Ok(orders);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            return Ok(orders);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetById(int id)
         {
-            try
+            var order = await _repository.GetByIdAsync(id);
+            if (order == null)
             {
-                var order = await _repository.GetByIdAsync(id);
-                if (order == null)
-                {
-                    return NotFound();
-                }
-                return order;
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            return order;
         }
 
         [HttpPost]
         public async Task<ActionResult<Order>> Post([FromBody] Order order)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                await _repository.CreateAsync(order);
-                return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            await _repository.CreateAsync(order);
+            return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Order order)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                if (id != order.Id)
-                {
-                    return BadRequest();
-                }
-                await _repository.UpdateAsync(order);
-                return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+            if (id != order.Id)
             {
-                return StatusCode(500);
+                return BadRequest();
             }
+            await _repository.UpdateAsync(order);
+            return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
+            var order = await _repository.GetByIdAsync(id);
+            if (order == null)
             {
-                var order = await _repository.GetByIdAsync(id);
-                if (order == null)
-                {
-                    return NotFound();
-                }
-                await _repository.DeleteAsync(order);
-                return Ok();
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            await _repository.DeleteAsync(order);
+            return Ok();
         }
     }
 }
