@@ -1,4 +1,6 @@
-﻿using EM_TestRepository.Entity;
+﻿using EM_Test.Mappers;
+using EM_Test.Models;
+using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,40 +18,41 @@ namespace EM_Test.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> GetAll()
+        public async Task<ActionResult<IEnumerable<LocationModel>>> GetAll()
         {
             var locations = await _repository.GetAllAsync();
             if (locations == null)
             {
                 return NotFound();
             }
-            return Ok(locations);
+            return Ok(LocationMapper.ToApiModel(locations));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Location>> GetById(int id)
+        public async Task<ActionResult<LocationModel>> GetById(int id)
         {
             var location = await _repository.GetByIdAsync(id);
             if (location == null)
             {
                 return NotFound();
             }
-            return location;
+            return LocationMapper.ToApiModel(location);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Location>> Post([FromBody] Location location)
+        public async Task<ActionResult<LocationModel>> Post([FromBody] LocationModel location)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            await _repository.CreateAsync(location);
-            return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
+            var loc = LocationMapper.FromApiModel(location);
+            await _repository.CreateAsync(loc);
+            return CreatedAtAction(nameof(GetById), new { id = loc.Id }, loc);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Location location)
+        public async Task<IActionResult> Put(int id, [FromBody] LocationModel location)
         {
             if (!ModelState.IsValid)
             {
@@ -59,7 +62,8 @@ namespace EM_Test.Controllers
             {
                 return BadRequest();
             }
-            await _repository.UpdateAsync(location);
+            var loc = LocationMapper.FromApiModel(location);
+            await _repository.UpdateAsync(loc);
             return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
         }
 
