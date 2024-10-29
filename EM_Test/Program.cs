@@ -1,3 +1,4 @@
+using EM_Test.Services;
 using EM_TestRepository.Context;
 using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
@@ -29,6 +30,8 @@ builder.Services.AddScoped<IRepository<Location>, RepositoryBase<Location>>();
 builder.Services.AddScoped<IRepository<Request>, RepositoryBase<Request>>();
 builder.Services.AddScoped<IRepository<Order>, RepositoryOrder>();
 builder.Services.AddScoped<ISortable<Order>, RepositoryOrder>();
+builder.Services.AddScoped<SortedService>();
+
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using EM_Test.Mappers;
 using EM_Test.Models;
+using EM_Test.Services;
 using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -11,35 +12,25 @@ namespace EM_Test.Controllers
     [Route("[controller]")]
     public class OrderController : Controller
     {
-        private readonly ILogger<OrderController> _logger;
         private readonly IRepository<Order> _orderRepository;
-        private readonly IRepository<Request> _requestRepository;
-        private readonly ISortable<Order> _sorter;
+        private readonly SortedService _sortedService;
 
-        public OrderController(ILogger<OrderController> logger, IRepository<Order> orderRepository, IRepository<Request> requestRepository, ISortable<Order> sorter)
+        public OrderController(IRepository<Order> orderRepository, SortedService sortedService)
         {
-            _logger = logger;
             _orderRepository = orderRepository;
-            _requestRepository = requestRepository;
-            _sorter = sorter;
+            _sortedService = sortedService;
         }
 
         [HttpGet("sort")]
         public async Task<ActionResult<IEnumerable<OrderModel>>> Sort(int idLocation, DateTime date)
         {
             var request = new RequestModel() { LocationId = idLocation, RequestTime = date };
-            var orders = await _sorter.Sort(idLocation, date);
-            if (orders == null || orders.Count() == 0)
+            request = await _sortedService.Sort(request);
+            if (!request.IsSuccess)
             {
-                _logger.LogInformation($"Request {idLocation} from date {date}. Answer: Not found");
-                request.Answer = "Not found";
-                await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
                 return NotFound();
             }
-            _logger.LogInformation($"Request {idLocation} from date {date}. Answer:{JsonSerializer.Serialize(orders)}");
-            request.Answer = JsonSerializer.Serialize(orders);
-            await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
-            return Ok(OrderMapper.ToApiModel(orders));
+            return Ok(request.AnswerModel);
         }
 
         [HttpGet]
