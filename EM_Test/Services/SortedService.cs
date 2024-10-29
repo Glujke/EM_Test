@@ -22,23 +22,22 @@ namespace EM_Test.Services
         }
 
 
-        public async Task<RequestModel> Sort(RequestModel request)
+        public async Task Sort(RequestModel request)
         {
             var orders = await _sorter.Sort(request.LocationId, request.RequestTime);
-            if (orders == null || orders.Count() == 0)
+            if (orders == null)
             {
                 _logger.LogInformation($"Request {request.LocationId} from date {request.RequestTime}. Answer: Not found");
                 request.Answer = "Not found";
                 await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
                 request.IsSuccess = false;
-                return request;
+                return;
             }
             _logger.LogInformation($"Request {request.LocationId} from date {request.RequestTime}. Answer:{JsonSerializer.Serialize(orders)}");
             request.AnswerModel = OrderMapper.ToApiModel(orders);
             request.Answer = JsonSerializer.Serialize(orders);
             await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
             request.IsSuccess = true;
-            return request;
         }
     }
 }

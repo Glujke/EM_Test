@@ -25,7 +25,7 @@ namespace EM_Test.Controllers
         public async Task<ActionResult<IEnumerable<OrderModel>>> Sort(int idLocation, DateTime date)
         {
             var request = new RequestModel() { LocationId = idLocation, RequestTime = date };
-            request = await _sortedService.Sort(request);
+            await _sortedService.Sort(request);
             if (!request.IsSuccess)
             {
                 return NotFound();
