@@ -28,13 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="EM_Test.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="EM_Test.db-shm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="EM_Test.db-wal">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
