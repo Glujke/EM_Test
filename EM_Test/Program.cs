@@ -1,6 +1,9 @@
 using EM_TestRepository.Context;
+using EM_TestRepository.Entity;
+using EM_TestRepository.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Numerics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +15,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddDbContext<EM_TestContext>(options =>
-    options.UseSqlite("Data Source=EM_Test.db"));
+options.UseSqlite("Data Source=EM_Test.db"));
+
+builder.Services.AddScoped<IRepository<Location>, RepositoryBase<Location>>();
+builder.Services.AddScoped<IRepository<Order>, RepositoryBase<Order>>();
 
 var app = builder.Build();
 

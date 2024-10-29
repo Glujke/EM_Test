@@ -1,32 +1,31 @@
 ﻿using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
 
 namespace EM_Test.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class OrderController : Controller
+    public class LocationController : Controller
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IRepository<Location> _repository;
 
-        public OrderController(IRepository<Order> repository)
+        public LocationController(IRepository<Location> repository)
         {
             _repository = repository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Location>>> GetAll()
         {
             try
             {
-                var orders = await _repository.GetAllAsync();
-                if (orders == null)
+                var locations = await _repository.GetAllAsync();
+                if (locations == null)
                 {
                     return NotFound();
                 }
-                return Ok(orders);
+                return Ok(locations);
             }
             catch (Exception ex)
             {
@@ -35,16 +34,16 @@ namespace EM_Test.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetById(int id)
+        public async Task<ActionResult<Location>> GetById(int id)
         {
             try
             {
-                var order = await _repository.GetByIdAsync(id);
-                if (order == null)
+                var location = await _repository.GetByIdAsync(id);
+                if (location == null)
                 {
                     return NotFound();
                 }
-                return order;
+                return location;
             }
             catch (Exception ex)
             {
@@ -53,7 +52,7 @@ namespace EM_Test.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Order>> Post([FromBody] Order order)
+        public async Task<ActionResult<Location>> Post([FromBody] Location location)
         {
             try
             {
@@ -61,8 +60,8 @@ namespace EM_Test.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                await _repository.CreateAsync(order);
-                return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+                await _repository.CreateAsync(location);
+                return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
             }
             catch (Exception ex)
             {
@@ -71,7 +70,7 @@ namespace EM_Test.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Order order)
+        public async Task<IActionResult> Put(int id, [FromBody] Location location)
         {
             try
             {
@@ -79,12 +78,12 @@ namespace EM_Test.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                if (id != order.Id)
+                if (id != location.Id)
                 {
                     return BadRequest();
                 }
-                await _repository.UpdateAsync(order);
-                return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+                await _repository.UpdateAsync(location);
+                return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
             }
             catch (Exception ex)
             {
@@ -97,12 +96,12 @@ namespace EM_Test.Controllers
         {
             try
             {
-                var order = await _repository.GetByIdAsync(id);
-                if (order == null)
+                var location = await _repository.GetByIdAsync(id);
+                if (location == null)
                 {
                     return NotFound();
                 }
-                await _repository.DeleteAsync(order);
+                await _repository.DeleteAsync(location);
                 return Ok();
             }
             catch (Exception ex)
