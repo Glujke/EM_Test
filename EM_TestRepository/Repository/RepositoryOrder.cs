@@ -15,11 +15,11 @@ namespace EM_TestRepository.Repository
         public override async Task<Order> GetByIdAsync(int id) =>
                await _context.Orders.Include(o => o.Location).FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<Order>> Sort(Location location, DateTime date)
+        public async Task<IEnumerable<Order>> Sort(int idLocation, DateTime date)
         {
-            var loc = await _context.Locations.SingleOrDefaultAsync(l => l.Name.Equals(location.Name));
-            if (loc == null) throw new Exception("Location field is incorrect");
-            var result = await _context.Orders.Where(o => o.Date >= date).Where(o => o.LocationId == loc.Id).Include(o => o.Location).ToListAsync();
+            var location = await _context.Locations.SingleOrDefaultAsync(l => l.Id == idLocation);
+            if (location == null) return null;
+            var result = await _context.Orders.Where(o => o.Date >= date).Where(o => o.LocationId == location.Id).Include(o => o.Location).ToListAsync();
             return result;
         }
     }

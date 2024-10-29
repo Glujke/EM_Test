@@ -9,6 +9,6 @@ namespace EM_TestRepository.Repository
 {
     public interface ISortable<TEntity>
     {
-        Task<IEnumerable<TEntity>> Sort(Location location, DateTime date);
+        Task<IEnumerable<TEntity>> Sort(int idLocation, DateTime date);
     }
 }

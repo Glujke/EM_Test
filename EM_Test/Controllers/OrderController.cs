@@ -19,11 +19,11 @@ namespace EM_Test.Controllers
         }
 
         [HttpPut("sort")]
-        public async Task<ActionResult<IEnumerable<Order>>> Sort(Location location, DateTime date)
+        public async Task<ActionResult<IEnumerable<Order>>> Sort(int idLocation, DateTime date)
         {
             try
             {
-                var orders = await _sorter.Sort(location, date);
+                var orders = await _sorter.Sort(idLocation, date);
                 if (orders == null)
                 {
                     return NotFound();
