@@ -29,7 +29,7 @@ namespace EM_Test.Controllers
             await _sortedService.Sort(request);
             if (!request.IsSuccess)
             {
-                return NotFound();
+                return Ok(new { });
             }
 
             return Ok(request.AnswerModel);

@@ -3,7 +3,6 @@ using EM_Test.Mappers;
 using EM_Test.Models;
 using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace EM_Test.Services
@@ -27,13 +26,13 @@ namespace EM_Test.Services
             var orders = await _sorter.Sort(request.LocationId, request.RequestTime);
             if (orders == null || orders.Count() == 0)
             {
-                _logger.LogInformation($"Request {request.LocationId} from date {request.RequestTime}. Answer: Not found");
+                _logger.LogInformation($"Request processed for street ID {request.LocationId} at time {request.RequestTime}. Result: Not found.");
                 request.Answer = "Not found";
                 await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
                 request.IsSuccess = false;
                 return;
             }
-            _logger.LogInformation($"Request {request.LocationId} from date {request.RequestTime}. Answer:{JsonSerializer.Serialize(orders)}");
+            _logger.LogInformation($"Request processed for street ID {request.LocationId} at time {request.RequestTime}. Result: {JsonSerializer.Serialize(orders)}");
             request.AnswerModel = OrderMapper.ToApiModel(orders);
             request.Answer = JsonSerializer.Serialize(orders);
             await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
