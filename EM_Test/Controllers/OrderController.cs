@@ -25,14 +25,14 @@ namespace EM_Test.Controllers
         [HttpGet("Sort")]
         public async Task<ActionResult<IEnumerable<OrderModel>>> Sort(int idLocation, DateTime date)
         {
-            var request = new RequestModel() { LocationId = idLocation, RequestTime = date };
-            await _sortedService.Sort(request);
-            if (!request.IsSuccess)
-            {
-                return Ok(new { });
-            }
+            if (idLocation < 0) return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "An error occurred while processing your request.",
+                detail: "The id field must not be negative");
 
-            return Ok(request.AnswerModel);
+            var sortedOrders = await _sortedService.Sort(idLocation, date);
+            var sortedModels = OrderMapper.ToApiModel(sortedOrders);
+            return Ok(sortedModels);
         }
 
         [HttpGet]

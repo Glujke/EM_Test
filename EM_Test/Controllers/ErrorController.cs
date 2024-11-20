@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.ExceptionServices;
 
 namespace EM_Test.Controllers
 {

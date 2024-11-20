@@ -21,23 +21,19 @@ namespace EM_Test.Services
         }
 
 
-        public async Task Sort(RequestModel request)
+        public async Task<IEnumerable<Order>> Sort(int idLocation, DateTime date)
         {
-            var orders = await _sorter.Sort(request.LocationId, request.RequestTime);
-            if (orders == null || orders.Count() == 0)
+            var orders = await _sorter.Sort(idLocation, date);
+            
+            _logger.LogInformation($"Request processed for street ID {idLocation} at time {date}. Result: {JsonSerializer.Serialize(orders)}");
+            var req = new Request()
             {
-                _logger.LogInformation($"Request processed for street ID {request.LocationId} at time {request.RequestTime}. Result: Not found.");
-                request.Answer = "Not found";
-                await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
-                request.IsSuccess = false;
-                return;
-            }
-            _logger.LogInformation($"Request processed for street ID {request.LocationId} at time {request.RequestTime}. Result: {JsonSerializer.Serialize(orders)}");
-            request.AnswerModel = OrderMapper.ToApiModel(orders);
-            request.Answer = JsonSerializer.Serialize(orders);
-            await _requestRepository.CreateAsync(RequestMapper.FromApiModel(request));
-            request.IsSuccess = true;
-            return;
+                LocationId = idLocation,
+                Answer = JsonSerializer.Serialize(orders),
+                RequestTime = date
+            };
+            await _requestRepository.CreateAsync(req);
+            return orders;
         }
     }
 }
