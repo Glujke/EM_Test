@@ -25,7 +25,7 @@ builder.Host.UseSerilog();
 
 
 builder.Services.AddScoped<IRepository<Location>, RepositoryBase<Location>>();
-builder.Services.AddScoped<IRepository<Request>, RepositoryBase<Request>>();
+builder.Services.AddScoped<IRepository<DeliveryOrder>, RepositoryBase<DeliveryOrder>>();
 builder.Services.AddScoped<IRepository<Order>, RepositoryOrder>();
 builder.Services.AddScoped<ISortable<Order>, RepositoryOrder>();
 builder.Services.AddScoped<SortedService>();

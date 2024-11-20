@@ -1,6 +1,4 @@
-﻿using EM_Test.Mappers;
-using EM_Test.Models;
-using EM_Test.Services;
+﻿using EM_Test.Services;
 using EM_TestRepository.Entity;
 using EM_TestRepository.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +21,7 @@ namespace EM_Test.Controllers
         }
 
         [HttpGet("Sort")]
-        public async Task<ActionResult<IEnumerable<OrderModel>>> Sort(int idLocation, DateTime date)
+        public async Task<ActionResult<IEnumerable<Order>>> Sort(int idLocation, DateTime date)
         {
             if (idLocation < 0) return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
@@ -31,12 +29,11 @@ namespace EM_Test.Controllers
                 detail: "The id field must not be negative");
 
             var sortedOrders = await _sortedService.Sort(idLocation, date);
-            var sortedModels = OrderMapper.ToApiModel(sortedOrders);
-            return Ok(sortedModels);
+            return Ok(sortedOrders);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderModel>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Order>>> GetAll()
         {
             var orders = await _orderRepository.GetAllAsync();
             if (orders == null)
@@ -44,11 +41,11 @@ namespace EM_Test.Controllers
                 return NotFound();
             }
 
-            return Ok(OrderMapper.ToApiModel(orders));
+            return Ok(orders);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderModel>> GetById(int id)
+        public async Task<ActionResult<Order>> GetById(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
@@ -56,33 +53,23 @@ namespace EM_Test.Controllers
                 return NotFound();
             }
 
-            return OrderMapper.ToApiModel(order);
+            return order;
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderModel>> Post([FromBody] OrderModel order)
+        public async Task<ActionResult<Order>> Post([FromBody] Order order)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var orderEntity = OrderMapper.FromApiModel(order);
             var localLocation = await _locationRepository.GetByIdAsync(order.Location.Id);
-            if (localLocation != null)
-            {
-                orderEntity.Location = null;
-            }
-            else
-            {
-                return BadRequest();
-            }
-
-            await _orderRepository.CreateAsync(orderEntity);
+            await _orderRepository.CreateAsync(order);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] OrderModel order)
+        public async Task<IActionResult> Put(int id, [FromBody] Order order)
         {
             if (!ModelState.IsValid)
             {
@@ -92,18 +79,7 @@ namespace EM_Test.Controllers
             {
                 return BadRequest();
             }
-            var orderEntity = OrderMapper.FromApiModel(order);
-            var localLocation = await _locationRepository.GetByIdAsync(order.Location.Id);
-            if (localLocation != null)
-            {
-                orderEntity.Location = null;
-            }
-            else
-            {
-                return BadRequest();
-            }
-
-            await _orderRepository.UpdateAsync(orderEntity);
+            await _orderRepository.UpdateAsync(order);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
@@ -115,7 +91,6 @@ namespace EM_Test.Controllers
             {
                 return NotFound();
             }
-
             await _orderRepository.DeleteAsync(order);
             return Ok();
         }

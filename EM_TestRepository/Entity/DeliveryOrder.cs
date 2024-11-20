@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace EM_TestRepository.Entity
 {
-    public class Request
+    public class DeliveryOrder
     {
         public int Id { get; set; }
-        public int LocationId { get; set; }
-        public DateTime RequestTime { get; set; }
-        public string Answer { get; set; }
+        public string Request { get; set; }
+        public string Response { get; set; }
     }
 }

@@ -7,10 +7,11 @@ namespace EM_TestRepository.Context
     {
         public DbSet<Location> Locations { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<Request> Requests { get; set; }
+        public DbSet<DeliveryOrder> DeliveryOrders { get; set; }
 
         public EM_TestContext(DbContextOptions<EM_TestContext> options) : base(options)
         {
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,6 +25,9 @@ namespace EM_TestRepository.Context
                  .HasIndex(l => l.Name)
                  .IsUnique();
         }
+        /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+        }*/
     }
 }
 
